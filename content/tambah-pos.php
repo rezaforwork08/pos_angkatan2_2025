@@ -67,7 +67,29 @@ $icrement_number = sprintf("%03s", $id_trans);
 $no_transaction = $format_no . "-" . $date . "-" . $icrement_number;
 // $no_transaction = $format_no . "-" . $date . "-" . str_pad("0", $id_trans, STR_PAD_LEFT);
 
+if (isset($_POST['save'])) {
+    $no_transaction = $_POST['no_transaction'];
+    $id_user = $_POST['id_user'];
+    $grand_total = $_POST['grand_total'];
 
+    $insTransaction = mysqli_query($config, "INSERT INTO transactions (id_user, no_transaction, sub_total) VALUES ('$id_user', '$no_transaction', '$grand_total')");
+
+    if ($insTransaction) {
+        $id_transaction = mysqli_insert_id($config);
+        $id_products = $_POST['id_product'];
+        $qtys = $_POST['qty'];
+        $totals = $_POST['total'];
+
+        foreach ($id_products as $key => $id_product) {
+            $qty = $qtys[$key];
+            $total = $totals[$key];
+
+            $insTransacDetail = mysqli_query($config, "INSERT INTO transaction_details (id_transaction, id_product, qty, total) VALUES ('$id_transaction', '$id_product', '$qty', '$total')");
+        }
+        header("location:?page=pos");
+        exit();
+    }
+}
 
 
 
@@ -130,7 +152,7 @@ $no_transaction = $format_no . "-" . $date . "-" . $icrement_number;
                                 </div>
                                 <div class="mb-3">
                                     <label for="">Product </label>
-                                    <select name="" id="id_product" class="form-control">
+                                    <select name="id_product" id="id_product" class="form-control">
                                         <option value="">Select One</option>
                                         <?php foreach ($rowProducts as $rowProduct): ?>
                                             <option data-price="<?php echo $rowProduct['price'] ?>" value="<?php echo $rowProduct['id'] ?>">
@@ -234,7 +256,7 @@ $no_transaction = $format_no . "-" . $date . "-" . $icrement_number;
         const tr = document.createElement('tr'); //<tr></tr>
         tr.innerHTML = `
         <td>${no}</td>
-        <td><input type='hidden' name='id_product[]' class='id_products'>${productName}</td>
+        <td><input type='hidden' name='id_product[]' class='id_products' value='${select.value}'>${productName}</td>
         <td>
             <input type='number' name='qty[]' value='1' class='qtys'>
             <input type='hidden' class='priceInput' name='price[]' value='${productPrice}'>

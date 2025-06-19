@@ -4,6 +4,16 @@ $query = mysqli_query($config, "SELECT users.name, transactions.* FROM transacti
   ORDER BY id DESC");
 // 12345, 54321
 $rows = mysqli_fetch_all($query, MYSQLI_ASSOC);
+
+if (isset($_GET['delete'])) {
+    $idDel = $_GET['delete'];
+
+    $del = mysqli_query($config, "DELETE FROM transactions WHERE id = '$idDel'");
+    if ($del) {
+        header("location:?page=pos");
+        exit();
+    }
+}
 ?>
 <div class="row">
     <div class="col-12">
@@ -31,13 +41,13 @@ $rows = mysqli_fetch_all($query, MYSQLI_ASSOC);
                                     <td><?php echo $no++; ?></td>
                                     <td><?php echo $row['no_transaction'] ?></td>
                                     <td><?php echo $row['name'] ?></td>
-                                    <td><?php echo "Rp." .  $row['subtotal'] ?></td>
+                                    <td><?php echo "Rp." .  $row['sub_total'] ?></td>
                                     <td>
 
-                                        <a href="?page=tambah-pos&print=<?php echo $row['id'] ?>"
-                                            class="btn btn-primary">Print</a>
+                                        <a href="?page=print-pos&print=<?php echo $row['id'] ?>"
+                                            class="btn btn-primary" target="_blank">Print</a>
                                         <a onclick="return confirm('Are you sure wanna delete this data??')"
-                                            href="?page=tambah-POS&delete=<?php echo $row['id'] ?>"
+                                            href="?page=pos&delete=<?php echo $row['id'] ?>"
                                             class="btn btn-danger">Delete</a>
 
                                     </td>
